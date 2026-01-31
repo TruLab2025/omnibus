@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnibus Admin Panel</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f4f4f9;
+        }
+
+        h1 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4f46e5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+        }
+
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Omnibus Admin ⚙️</h1>
+
+    <div class="card">
+        <h2>Dodaj / Edytuj Afiliację</h2>
+        <form id="affiliateForm">
+            <label>Domena (np. mediaexpert.pl)</label>
+            <input type="text" id="domain" required placeholder="example.com">
+
+            <label>Sieć Afiliacyjna</label>
+            <input type="text" id="network" required placeholder="np. TradeTracker">
+
+            <label>Szablon Linku ({url} zostanie podmieniony)</label>
+            <input type="text" id="template" required placeholder="https://tracking.com/?url={url}">
+
+            <div style="margin-bottom: 15px;">
+                <input type="checkbox" id="active" checked>
+                <label for="active" style="display:inline;">Aktywny</label>
+            </div>
+
+            <button type="submit">Zapisz Regułę</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Lista Domen</h2>
+        <table id="affiliateTable">
+            <thead>
+                <tr>
+                    <th>Domena</th>
+                    <th>Sieć</th>
+                    <th>Status</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Wiersze z JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const form = document.getElementById('affiliateForm');
+        const tableBody = document.querySelector('#affiliateTable tbody');
+
+        async function loadAffiliates() {
+            const res = await fetch('/admin/affiliates');
+            const data = await res.json();
+            renderTable(data);
+        }
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            for (const [domain, rule] of Object.entries(data)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${domain}</td>
+                    <td>${rule.network}</td>
+                    <td class="${rule.active ? 'status-active' : 'status-inactive'}">${rule.active ? 'AKTYWNY' : 'NIEAKTYWNY'}</td>
+                    <td>
+                        <button class="action-btn" onclick="editRule('${domain}', '${rule.network}', '${rule.template}', ${rule.active})">Edytuj</button>
+                        <button class="action-btn delete-btn" onclick="deleteRule('${domain}')">Usuń</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                domain: document.getElementById('domain').value.trim(),
+                network: document.getElementById('network').value.trim(),
+                template: document.getElementById('template').value.trim(),
+                active: document.getElementById('active').checked
+            };
+
+            await fetch('/admin/affiliates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            form.reset();
+            loadAffiliates();
+        });
+
+        window.editRule = (domain, network, template, active) => {
+            document.getElementById('domain').value = domain;
+            document.getElementById('network').value = network;
+            document.getElementById('template').value = template;
+            document.getElementById('active').checked = active;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.deleteRule = async (domain) => {
+            if (!confirm(`Czy na pewno usunąć regułę dla ${domain}?`)) return;
+            await fetch(`/admin/affiliates/${domain}`, { method: 'DELETE' });
+            loadAffiliates();
+        };
+
+        // Init
+        loadAffiliates();
+    </script>
+
+</body>
+
+</html>
