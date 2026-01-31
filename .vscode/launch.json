@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🚀 URUCHOM PROJEKT (Backend + Safari)",
+            "type": "python",
+            "request": "launch",
+            "program": "/Users/trulab/.gemini/antigravity/scratch/price-checker-poc/app.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

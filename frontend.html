@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Tracker PoC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --red: #ef4444;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input::placeholder {
+            color: #64748b;
+            opacity: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-card {
+            margin-top: 32px;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .status-badge.red {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        .status-badge.yellow {
+            background: rgba(255, 187, 51, 0.2);
+            color: #ffbb33;
+            border: 1px solid #ffbb33;
+        }
+
+        .status-badge.green {
+            background: rgba(0, 200, 81, 0.2);
+            color: #00c851;
+            border: 1px solid #00c851;
+        }
+
+        .status-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+        }
+
+        .status-yellow {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--yellow);
+        }
+
+        .status-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+        }
+
+        .price-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .product-overview {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .product-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .price-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .savings {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--green);
+            margin-top: 8px;
+        }
+
+        .track-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-msg {
+            color: var(--green);
+            text-align: center;
+            font-size: 14px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .verdict-message {
+            margin-top: 12px;
+            font-size: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .verdict-message.red {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .verdict-message.yellow {
+            color: #ffbb33;
+            background: rgba(255, 187, 51, 0.1);
+        }
+
+        .verdict-message.green {
+            color: #00c851;
+            background: rgba(0, 200, 81, 0.1);
+        }
+
+        .highlight-amount {
+            font-size: 1.1em;
+            font-weight: 800;
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        .warning-msg {
+            background: rgba(234, 179, 8, 0.1);
+            border-left: 4px solid var(--yellow);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--yellow);
+            display: none;
+        }
+
+        /* Tracked List Styles */
+        .tracked-list-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--slate-800);
+        }
+
+        .tracked-list-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tracked-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tracked-card {
+            background: var(--slate-900);
+            border: 1px solid var(--slate-800);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tracked-card:hover {
+            border-color: var(--indigo-500);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .tracked-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .tracked-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #818cf8;
+            /* Light indigo for visibility */
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            transition: color 0.2s;
+        }
+
+        .tracked-title:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .tracked-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--slate-800);
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: 1px solid var(--slate-700);
+            color: var(--slate-400);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .tracked-email {
+            font-size: 12px;
+            color: var(--slate-500);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="mainContainer">
+        <h1>Werdykt Cenowy</h1>
+        <p class="subtitle">Wklej URL produktu, aby sprawdzić okazję</p>
+
+        <div id="checkView">
+            <div class="input-group">
+                <label for="urlInput">URL Produktu</label>
+                <input type="text" id="urlInput" placeholder="https://www.mediaexpert.pl/...">
+            </div>
+            <button id="checkBtn">
+                <span id="btnText">Sprawdź Cenę</span>
+                <div class="loader" id="loader"></div>
+            </button>
+
+            <!-- Batch Check Button -->
+            <button id="batchCheckBtn"
+                style="margin-top: 12px; background: transparent; border: 1px solid var(--primary); color: var(--primary);">
+                <span id="batchBtnText">Sprawdź wszystkie śledzone</span>
+                <div class="loader" id="batchLoader"></div>
+            </button>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <div id="warningMsg" class="warning-msg"></div>
+            <div id="statusBadge" class="status-badge">Green</div>
+
+            <div class="product-overview">
+                <a id="productImgLink" href="#" target="_blank">
+                    <img id="productImg" src="" alt="Produkt" class="product-img">
+                </a>
+                <div class="product-info">
+                    <a id="productTitleLink" href="#" target="_blank" style="text-decoration: none;">
+                        <h2 id="productTitle" class="product-title">Nazwa Produktu</h2>
+                    </a>
+                    <p id="productDesc" class="product-desc">Krótki opis produktu zaciągnięty ze strony.</p>
+                </div>
+            </div>
+
+            <div class="price-details">
+                <div>
+                    <div class="price-label">Aktualna Cena</div>
+                    <div class="price-value" id="currentPriceDisplay">0.00 PLN</div>
+                </div>
+                <div>
+                    <div class="price-label">Najniższa z 30 dni</div>
+                    <div class="price-value" id="lowestPriceDisplay">0.00 PLN</div>
+                </div>
+            </div>
+
+            <div id="verdictMessage" class="verdict-message"></div>
+
+            <div class="track-section" id="trackSection">
+                <div class="input-group">
+                    <label for="emailInput">Otrzymuj alerty, gdy cena spadnie</label>
+                    <input type="email" id="emailInput" placeholder="twoj@email.com">
+                </div>
+                <button id="trackBtn">Śledź lepszą cenę</button>
+                <div class="success-msg" id="successMsg">✨ Produkt jest teraz śledzony!</div>
+            </div>
+        </div>
+
+        <!-- Nowa sekcja śledzonych produktów -->
+        <div class="tracked-list-section">
+            <h3 class="tracked-list-title">📦 Moje śledzone produkty</h3>
+            <div id="trackedGrid" class="tracked-grid">
+                <!-- Tu trafią produkty z JS -->
+                <div style="color: var(--slate-500); font-style: italic;">Ładowanie produktów...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const checkBtn = document.getElementById('checkBtn');
+        const trackBtn = document.getElementById('trackBtn');
+        const urlInput = document.getElementById('urlInput');
+        const emailInput = document.getElementById('emailInput');
+        const resultCard = document.getElementById('resultCard');
+        const loader = document.getElementById('loader');
+        const btnText = document.getElementById('btnText');
+        const successMsg = document.getElementById('successMsg');
+
+        let lastResult = null;
+
+        checkBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            // Reset and show loader
+            checkBtn.disabled = true;
+            loader.style.display = 'block';
+            btnText.style.display = 'none';
+            resultCard.style.display = 'none';
+            successMsg.style.display = 'none';
+            trackBtn.style.display = 'block';
+            emailInput.disabled = false;
+            emailInput.value = '';
+
+            try {
+                const response = await fetch('/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                if (!response.ok) throw new Error('Nie udało się sprawdzić ceny');
+                urlInput.value = ''; // Clear input on success
+
+                const data = await response.json();
+                lastResult = { ...data, url: url }; // Store the searched URL
+
+                // Update UI
+                const statusBadge = document.getElementById('statusBadge');
+                document.getElementById('productTitle').innerText = data.title || "Produkt";
+                document.getElementById('productTitleLink').href = url;
+                document.getElementById('productImgLink').href = url;
+                document.getElementById('productDesc').innerText = data.description || "Brak opisu";
+                document.getElementById('productImg').src = data.image_url || "https://via.placeholder.com/150";
+
+                document.getElementById('currentPriceDisplay').innerText = `${data.current_price.toFixed(2)} ${data.currency}`;
+                document.getElementById('lowestPriceDisplay').innerText = `${data.lowest_30d.toFixed(2)} ${data.currency}`;
+
+                const statusMap = {
+                    'green': 'KUPUJ',
+                    'yellow': 'OBSERWUJ',
+                    'red': 'CZEKAJ'
+                };
+
+                statusBadge.innerText = statusMap[data.status] || data.status.toUpperCase();
+                statusBadge.className = 'status-badge ' + data.status;
+
+                const verdictMsg = document.getElementById('verdictMessage');
+                verdictMsg.className = 'verdict-message ' + data.status;
+
+                if (data.status === 'green') {
+                    verdictMsg.innerHTML = `Cena z 30 dni niższa o:<span class="highlight-amount">${data.savings.toFixed(2)} PLN</span>`;
+                } else if (data.status === 'yellow') {
+                    verdictMsg.innerText = "Cena z 30 dni bez zmian";
+                } else {
+                    const increase = data.current_price - data.lowest_30d;
+                    verdictMsg.innerHTML = `Cena z 30 dni wyższa o:<span class="highlight-amount">${increase.toFixed(2)} PLN</span>`;
+                }
+
+                const warningBox = document.getElementById('warningMsg');
+                if (data.is_simulated) {
+                    warningBox.innerText = data.warning || "Uwaga: Strona zablokowała pobieranie. Widzisz dane testowe.";
+                    warningBox.style.display = 'block';
+                } else {
+                    warningBox.style.display = 'none';
+                }
+
+                // Dynamic Button Adjustment
+                const emailInputGroup = document.querySelector('.input-group label[for="emailInput"]').parentElement;
+                if (data.status === 'green') {
+                    trackBtn.innerText = "KUP TERAZ W SKLEPIE 🛒";
+                    trackBtn.style.background = 'var(--green)';
+                    emailInput.style.display = 'none';
+                    emailInputGroup.style.display = 'none';
+                } else {
+                    trackBtn.innerText = "Śledź lepszą cenę 🔔";
+                    trackBtn.style.background = 'var(--primary)';
+                    emailInput.style.display = 'block';
+                    emailInputGroup.style.display = 'block';
+                }
+
+                resultCard.style.display = 'block';
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                checkBtn.disabled = false;
+                loader.style.display = 'none';
+                btnText.style.display = 'block';
+            }
+        });
+
+        // Enter key support for URL input
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkBtn.click();
+            }
+        });
+
+        trackBtn.addEventListener('click', async () => {
+            if (lastResult && lastResult.status === 'green') {
+                window.open(lastResult.url, '_blank');
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            if (!email || !lastResult) return;
+
+            trackBtn.disabled = true;
+
+            try {
+                const response = await fetch('/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: lastResult.url,
+                        email: email,
+                        current_price: lastResult.current_price,
+                        lowest_30d: lastResult.lowest_30d,
+                        status: lastResult.status,
+                        title: lastResult.title,
+                        image_url: lastResult.image_url
+                    })
+                });
+
+                if (!response.ok) throw new Error('Nie udało się zapisać śledzenia');
+                urlInput.value = ''; // Clear input on success
+                successMsg.style.display = 'block';
+                trackBtn.style.display = 'none';
+                emailInput.disabled = true;
+
+                // Refresh list
+                fetchTracked();
+            } catch (err) {
+                alert('Błąd: ' + err.message);
+                trackBtn.disabled = false;
+            }
+        });
+
+        // Tracked List Functions
+        async function fetchTracked() {
+            const grid = document.getElementById('trackedGrid');
+            try {
+                const response = await fetch('/tracked');
+                const items = await response.json();
+
+                if (items.length === 0) {
+                    grid.innerHTML = '<div style="color: var(--slate-500); font-style: italic;">Brak śledzonych produktów</div>';
+                    return;
+                }
+
+                grid.innerHTML = items.map(item => `
+                    <div class="tracked-card" id="card-${item.id}">
+                        <div class="tracked-header">
+                            <div style="flex: 1;">
+                                <a href="${item.url}" target="_blank" style="text-decoration: none;">
+                                    <div class="tracked-title">${item.title || item.url}</div>
+                                </a>
+                                <div class="tracked-email">${item.email}</div>
+                            </div>
+                            <span class="status-badge ${item.status}">${statusMap[item.status] || item.status}</span>
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            ${item.image_url ? `
+                                <a href="${item.url}" target="_blank">
+                                    <img src="${item.image_url}" style="width: 60px; height: 60px; object-fit: contain; background: white; border-radius: 8px; padding: 4px; cursor: pointer;">
+                                </a>` : ''}
+                            <div style="font-size: 20px; font-weight: 800; color: white;">
+                                ${item.last_known_price.toFixed(2)} ${item.currency}
+                            </div>
+                        </div>
+                        <div class="tracked-footer">
+                            <div style="font-size: 11px; color: var(--slate-600);">Dodano: ${new Date(item.created_at).toLocaleDateString()}</div>
+                            <button class="delete-btn" onclick="deleteItem('${item.id}')">Usuń</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                grid.innerHTML = '<div style="color: var(--red); font-size: 12px;">Nie udało się pobrać listy</div>';
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Czy na pewno chcesz przestać śledzić ten produkt?')) return;
+
+            try {
+                const response = await fetch(`/tracked/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Nie udało się usunąć');
+
+                fetchTracked();
+            } catch (err) {
+                alert('Błąd podczas usuwania: ' + err.message);
+            }
+        }
+
+        // Initial fetch
+        const statusMap = {
+            'green': 'KUPUJ',
+            'yellow': 'OBSERWUJ',
+            'red': 'CZEKAJ'
+        };
+        fetchTracked();
+
+        // Batch Check Logic
+        const batchCheckBtn = document.getElementById('batchCheckBtn');
+        const batchLoader = document.getElementById('batchLoader');
+        const batchBtnText = document.getElementById('batchBtnText');
+
+        batchCheckBtn.addEventListener('click', async () => {
+            batchCheckBtn.disabled = true;
+            batchLoader.style.display = 'block';
+            batchBtnText.style.display = 'none';
+
+            try {
+                const response = await fetch('/run-check', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) throw new Error('Nie udało się uruchomić sprawdzania zbiorczego');
+
+                alert('Sprawdzanie wszystkich produktów zakończone pomyślnie!');
+            } catch (err) {
+                alert('Błąd: ' + err.message);
+            } finally {
+                batchCheckBtn.disabled = false;
+                batchLoader.style.display = 'none';
+                batchBtnText.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

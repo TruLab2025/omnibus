@@ -1,0 +1,19 @@
+# Wrażliwe dane
+.env
+
+# Baza danych (PoC lokalne)
+tracked.json
+
+# Pliki tymczasowe Pythona
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Środowisko wirtualne
+venv/
+.venv/
+env/
+
+# Systemowe
+.DS_Store
+Thumbs.db

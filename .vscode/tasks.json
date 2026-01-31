@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OpenSafari",
+            "type": "shell",
+            "command": "open -a Safari ${workspaceFolder}/frontend.html",
+            "problemMatcher": []
+        }
+    ]
+}

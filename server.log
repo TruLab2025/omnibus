@@ -1,0 +1,39 @@
+/Users/trulab/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+INFO:     Started server process [10889]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52576 - "GET / HTTP/1.1" 200 OK
+Successfully parsed current_price: 23.0 from https://www.tophifi.pl/przewody/przewody-glosnikowe/audioquest-slip-db-16-2.html
+Successfully parsed lowest_30d: 24.0 from https://www.tophifi.pl/przewody/przewody-glosnikowe/audioquest-slip-db-16-2.html
+INFO:     127.0.0.1:52576 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52607 - "GET / HTTP/1.1" 200 OK
+Successfully parsed current_price: 899.0 from https://www.tophifi.pl/sluchawki/sluchawki-z-redukcja-szumow/bowers-wilkins-px7-s2e.html
+Successfully parsed lowest_30d: 896.0 from https://www.tophifi.pl/sluchawki/sluchawki-z-redukcja-szumow/bowers-wilkins-px7-s2e.html
+INFO:     127.0.0.1:52607 - "POST /check HTTP/1.1" 200 OK
+Successfully parsed current_price: 2099.0 from https://www.tophifi.pl/glosniki/glosniki-podlogowe/indiana-line-tesi-6.html
+Note: No lowest_30d found for https://www.tophifi.pl/glosniki/glosniki-podlogowe/indiana-line-tesi-6.html, assuming same as current_price
+INFO:     127.0.0.1:52895 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53071 - "GET / HTTP/1.1" 200 OK
+Successfully parsed current_price: 2099.0 from https://www.tophifi.pl/glosniki/glosniki-podlogowe/indiana-line-tesi-6.html
+Note: No lowest_30d found for https://www.tophifi.pl/glosniki/glosniki-podlogowe/indiana-line-tesi-6.html, assuming same as current_price
+INFO:     127.0.0.1:53071 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54131 - "GET / HTTP/1.1" 200 OK
+Successfully parsed current_price: 59.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+Successfully parsed lowest_30d: 99.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+INFO:     127.0.0.1:54140 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54151 - "POST /track HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54333 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54333 - "GET /tracked HTTP/1.1" 404 Not Found
+Successfully parsed current_price: 59.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+Successfully parsed lowest_30d: 99.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+INFO:     127.0.0.1:54333 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54365 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54365 - "GET /tracked HTTP/1.1" 404 Not Found
+Successfully parsed current_price: 59.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+Successfully parsed lowest_30d: 99.0 from https://www.tophifi.pl/sluchawki/sluchawki-nauszne/koss-ur23i-czarny.html
+INFO:     127.0.0.1:54365 - "POST /check HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54387 - "GET /tracked HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54397 - "GET /tracked HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54411 - "GET /tracked HTTP/1.1" 404 Not Found
